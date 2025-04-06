@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills Tree</title>
+    <style>
+        :root {
+            --node-bg: #ffffff;
+            --node-border: #d0d7de;
+            --node-hover: #f6f8fa;
+            --line-color: #d0d7de;
+            --text-color: #24292f;
+            --tooltip-bg: #24292f;
+            --tooltip-text: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: #f6f8fa;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: auto;
+            padding: 40px 0;
+        }
+
+        .tree-container {
+            position: relative;
+            padding: 20px;
+            min-width: 800px;
+        }
+
+        .skills-tree {
+            position: relative;
+        }
+
+        .node {
+            position: absolute;
+            background-color: var(--node-bg);
+            border: 1px solid var(--node-border);
+            border-radius: 6px;
+            padding: 12px 16px;
+            min-width: 120px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .node:hover {
+            background-color: var(--node-hover);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .node.expanded .node-content {
+            font-weight: 600;
+        }
+
+        .connector {
+            position: absolute;
+            background-color: var(--line-color);
+            z-index: 5;
+        }
+
+        .vertical-connector {
+            width: 2px;
+        }
+
+        .horizontal-connector {
+            height: 2px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: var(--tooltip-bg);
+            color: var(--tooltip-text);
+            padding: 8px 12px;
+            border-radius: 4px;
+            max-width: 300px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            z-index: 100;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .tooltip-visible {
+            opacity: 1;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .controls button {
+            padding: 8px 16px;
+            background-color: #0969da;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .controls button:hover {
+            background-color: #0a59c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Skills Tree</h1>
+        <div class="tree-container">
+            <div id="skills-tree" class="skills-tree"></div>
+        </div>
+        <div class="controls">
+            <button id="expand-all">Expand All</button>
+            <button id="collapse-all">Collapse All</button>
+        </div>
+    </div>
+
+    <script>
+        // Skills tree data structure
+        const skillsData = {
+            id: "root",
+            label: "My Skills",
+            description: "An overview of my professional skills and expertise",
+            children: [
+                {
+                    id: "software-engineering",
+                    label: "Software Engineering",
+                    description: "8+ years of experience in software development across multiple domains",
+                    children: [
+                        {
+                            id: "software-design",
+                            label: "Software Design",
+                            description: "Experience with architecture patterns, system design, and clean code principles",
+                            children: [
+                                {
+                                    id: "design-patterns",
+                                    label: "Design Patterns",
+                                    description: "Implementation of common design patterns: Factory, Singleton, Observer, etc."
+                                },
+                                {
+                                    id: "clean-architecture",
+                                    label: "Clean Architecture",
+                                    description: "Building systems with separation of concerns and dependency management"
+                                }
+                            ]
+                        },
+                        {
+                            id: "testing",
+                            label: "Testing",
+                            description: "Expertise in various testing methodologies and frameworks",
+                            children: [
+                                {
+                                    id: "unit-testing",
+                                    label: "Unit Testing",
+                                    description: "Experience with Jest, JUnit, pytest, and other testing frameworks"
+                                },
+                                {
+                                    id: "integration-testing",
+                                    label: "Integration Testing",
+                                    description: "End-to-end testing of complex systems and APIs"
+                                }
+                            ]
+                        },
+                        {
+                            id: "languages",
+                            label: "Languages",
+                            description: "Programming languages I've worked with professionally",
+                            children: [
+                                {
+                                    id: "javascript",
+                                    label: "JavaScript",
+                                    description: "5+ years of experience with JS, TypeScript, and related frameworks"
+                                },
+                                {
+                                    id: "python",
+                                    label: "Python",
+                                    description: "4+ years of experience in data science and backend development"
+                                },
+                                {
+                                    id: "cpp",
+                                    label: "C++",
+                                    description: "3+ years experience in systems programming and performance optimization"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "machine-learning",
+                    label: "Machine Learning",
+                    description: "Experience with various ML algorithms and frameworks",
+                    children: [
+                        {
+                            id: "deep-learning",
+                            label: "Deep Learning",
+                            description: "Neural networks and deep learning frameworks",
+                            children: [
+                                {
+                                    id: "tensorflow",
+                                    label: "TensorFlow",
+                                    description: "Building and deploying models with TensorFlow and Keras"
+                                },
+                                {
+                                    id: "pytorch",
+                                    label: "PyTorch",
+                                    description: "Research and prototyping with PyTorch"
+                                }
+                            ]
+                        },
+                        {
+                            id: "ml-algorithms",
+                            label: "ML Algorithms",
+                            description: "Experience with traditional machine learning algorithms",
+                            children: [
+                                {
+                                    id: "supervised",
+                                    label: "Supervised Learning",
+                                    description: "Classification and regression techniques"
+                                },
+                                {
+                                    id: "unsupervised",
+                                    label: "Unsupervised Learning",
+                                    description: "Clustering and dimensionality reduction"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // Tree rendering constants
+        const NODE_WIDTH = 160;
+        const NODE_HEIGHT = 60;
+        const LEVEL_HEIGHT = 140;
+        const HORIZONTAL_SPACING = 40;
+
+        // Global variables
+        let expandedNodes = new Set();
+        let nodeElements = {};
+        let tooltip = null;
+
+        // Initialize the tree
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTree();
+            createTooltip();
+            setupEventListeners();
+        });
+
+        function initializeTree() {
+            const treeContainer = document.getElementById('skills-tree');
+            treeContainer.innerHTML = '';
+            
+            // Start with the root node expanded
+            expandedNodes.add(skillsData.id);
+            
+            // Render the tree starting from the root
+            renderNode(skillsData, 0, 0, treeContainer);
+            
+            // Calculate node positions and render connectors
+            positionNodes();
+            renderConnectors();
+        }
+
+        function createNode(node) {
+            const nodeElement = document.createElement('div');
+            nodeElement.id = node.id;
+            nodeElement.className = 'node';
+            if (expandedNodes.has(node.id)) {
+                nodeElement.classList.add('expanded');
+            }
+            
+            const nodeContent = document.createElement('div');
+            nodeContent.className = 'node-content';
+            nodeContent.textContent = node.label;
+            
+            nodeElement.appendChild(nodeContent);
+            nodeElement.dataset.description = node.description;
+            nodeElement.dataset.nodeId = node.id;
+            
+            // Store reference to DOM element
+            nodeElements[node.id] = nodeElement;
+            
+            return nodeElement;
+        }
+
+        function renderNode(node, level, index, container) {
+            const nodeElement = createNode(node);
+            container.appendChild(nodeElement);
+            
+            // If the node is expanded and has children, render them too
+            if (expandedNodes.has(node.id) && node.children && node.children.length > 0) {
+                node.children.forEach((child, childIndex) => {
+                    renderNode(child, level + 1, childIndex, container);
+                });
+            }
+        }
+
+        function positionNodes() {
+            // Calculate positions for all visible nodes
+            calculateNodePositions(skillsData, 0, 0);
+        }
+
+        function calculateNodePositions(node, level, startX) {
+            if (!expandedNodes.has(node.id) && node.id !== skillsData.id) {
+                return { width: 0, node: null };
+            }
+            
+            const nodeElement = nodeElements[node.id];
+            
+            if (!node.children || node.children.length === 0 || !expandedNodes.has(node.id)) {
+                // Position leaf node
+                nodeElement.style.top = `${level * LEVEL_HEIGHT}px`;
+                nodeElement.style.left = `${startX}px`;
+                return { width: NODE_WIDTH, node: nodeElement };
+            }
+            
+            // Calculate positions of all children
+            let totalChildrenWidth = 0;
+            const childPositions = [];
+            
+            node.children.forEach((child) => {
+                const childResult = calculateNodePositions(
+                    child, 
+                    level + 1, 
+                    startX + totalChildrenWidth
+                );
+                if (childResult.width > 0) {
+                    totalChildrenWidth += childResult.width + HORIZONTAL_SPACING;
+                    childPositions.push(childResult);
+                }
+            });
+            
+            // Adjust for spacing after the last child
+            if (totalChildrenWidth > 0) {
+                totalChildrenWidth -= HORIZONTAL_SPACING;
+            }
+            
+            // Position parent node centered above its children
+            const nodeX = startX + (totalChildrenWidth - NODE_WIDTH) / 2;
+            nodeElement.style.top = `${level * LEVEL_HEIGHT}px`;
+            nodeElement.style.left = `${Math.max(0, nodeX)}px`;
+            
+            return { 
+                width: Math.max(NODE_WIDTH, totalChildrenWidth), 
+                node: nodeElement,
+                childPositions: childPositions
+            };
+        }
+
+        function renderConnectors() {
+            // Clear existing connectors
+            const existingConnectors = document.querySelectorAll('.connector');
+            existingConnectors.forEach(connector => connector.remove());
+            
+            // Create new connectors by traversing the tree
+            createConnectors(skillsData);
+        }
+
+        function createConnectors(node) {
+            if (!expandedNodes.has(node.id) && node.id !== skillsData.id) {
+                return;
+            }
+            
+            if (!node.children || node.children.length === 0 || !expandedNodes.has(node.id)) {
+                return;
+            }
+            
+            const parentElement = nodeElements[node.id];
+            const parentRect = parentElement.getBoundingClientRect();
+            const containerRect = document.querySelector('.tree-container').getBoundingClientRect();
+            
+            const parentLeft = parentElement.offsetLeft;
+            const parentTop = parentElement.offsetTop;
+            const parentWidth = NODE_WIDTH;
+            const parentHeight = NODE_HEIGHT;
+            
+            // Create vertical connector from parent
+            const parentConnector = document.createElement('div');
+            parentConnector.className = 'connector vertical-connector';
+            parentConnector.style.left = `${parentLeft + parentWidth / 2}px`;
+            parentConnector.style.top = `${parentTop + parentHeight}px`;
+            parentConnector.style.height = `${LEVEL_HEIGHT - parentHeight}px`;
+            document.querySelector('.skills-tree').appendChild(parentConnector);
+            
+            // Create horizontal connector spanning all children if there's more than one child
+            const visibleChildren = node.children.filter(child => expandedNodes.has(node.id));
+            if (visibleChildren.length > 1) {
+                const firstChild = nodeElements[visibleChildren[0].id];
+                const lastChild = nodeElements[visibleChildren[visibleChildren.length - 1].id];
+                
+                if (firstChild && lastChild) {
+                    const horizontalConnector = document.createElement('div');
+                    horizontalConnector.className = 'connector horizontal-connector';
+                    horizontalConnector.style.top = `${parentTop + parentHeight + (LEVEL_HEIGHT - parentHeight) / 2}px`;
+                    horizontalConnector.style.left = `${firstChild.offsetLeft + parentWidth / 2}px`;
+                    horizontalConnector.style.width = `${lastChild.offsetLeft - firstChild.offsetLeft + parentWidth / 2}px`;
+                    document.querySelector('.skills-tree').appendChild(horizontalConnector);
+                }
+            }
+            
+            // Create vertical connectors to each child
+            node.children.forEach(child => {
+                if (expandedNodes.has(node.id)) {
+                    const childElement = nodeElements[child.id];
+                    if (childElement) {
+                        const verticalConnector = document.createElement('div');
+                        verticalConnector.className = 'connector vertical-connector';
+                        verticalConnector.style.left = `${childElement.offsetLeft + parentWidth / 2}px`;
+                        verticalConnector.style.top = `${parentTop + parentHeight + (LEVEL_HEIGHT - parentHeight) / 2}px`;
+                        verticalConnector.style.height = `${(LEVEL_HEIGHT - parentHeight) / 2}px`;
+                        document.querySelector('.skills-tree').appendChild(verticalConnector);
+                    }
+                    // Recursively create connectors for this child's children
+                    createConnectors(child);
+                }
+            });
+        }
+
+        function createTooltip() {
+            tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            document.body.appendChild(tooltip);
+        }
+
+        function setupEventListeners() {
+            // Node click event for expanding/collapsing
+            document.addEventListener('click', function(e) {
+                const node = e.target.closest('.node');
+                if (node) {
+                    const nodeId = node.dataset.nodeId;
+                    toggleNode(nodeId);
+                }
+            });
+            
+            // Mouse over/out events for tooltips
+            document.addEventListener('mouseover', function(e) {
+                const node = e.target.closest('.node');
+                if (node) {
+                    showTooltip(node, e);
+                }
+            });
+            
+            document.addEventListener('mouseout', function(e) {
+                const node = e.target.closest('.node');
+                if (node) {
+                    hideTooltip();
+                }
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                const node = e.target.closest('.node');
+                if (node) {
+                    positionTooltip(e);
+                }
+            });
+            
+            // Expand/collapse all buttons
+            document.getElementById('expand-all').addEventListener('click', expandAll);
+            document.getElementById('collapse-all').addEventListener('click', collapseAll);
+        }
+
+        function toggleNode(nodeId) {
+            if (expandedNodes.has(nodeId)) {
+                expandedNodes.delete(nodeId);
+            } else {
+                expandedNodes.add(nodeId);
+            }
+            
+            // Re-render the tree
+            initializeTree();
+        }
+
+        function showTooltip(node, event) {
+            tooltip.textContent = node.dataset.description;
+            tooltip.classList.add('tooltip-visible');
+            positionTooltip(event);
+        }
+
+        function hideTooltip() {
+            tooltip.classList.remove('tooltip-visible');
+        }
+
+        function positionTooltip(event) {
+            const x = event.clientX + 15;
+            const y = event.clientY + 15;
+            tooltip.style.left = `${x}px`;
+            tooltip.style.top = `${y}px`;
+        }
+
+        function expandAll() {
+            // Add all node IDs to expandedNodes
+            function addAllNodes(node) {
+                expandedNodes.add(node.id);
+                if (node.children) {
+                    node.children.forEach(addAllNodes);
+                }
+            }
+            
+            addAllNodes(skillsData);
+            initializeTree();
+        }
+
+        function collapseAll() {
+            // Clear all except root
+            expandedNodes.clear();
+            expandedNodes.add(skillsData.id);
+            initializeTree();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Skill Tree</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+
+        #tree-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: #f7f7f7;
+        }
+
+        .node {
+            position: absolute;
+            padding: 10px 16px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .node:hover {
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: #333;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: none;
+            pointer-events: none;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="tree-container">
+        <canvas id="canvas"></canvas>
+        <div class="tooltip" id="tooltip"></div>
+    </div>
+
+    <script>
+        const skills = [
+            { id: 'se', label: 'Software Engineering', x: 400, y: 50, description: 'General SE knowledge' },
+            { id: 'testing', label: 'Unit Testing', x: 250, y: 200, parent: 'se', description: 'Experience with Jest, JUnit' },
+            { id: 'design', label: 'Software Design', x: 550, y: 200, parent: 'se', description: 'UML, architecture patterns' },
+            { id: 'cpp', label: 'C++', x: 200, y: 350, parent: 'testing', description: 'Used in competitive programming' },
+            { id: 'python', label: 'Python', x: 600, y: 350, parent: 'design', description: 'Scripting and ML' },
+        ];
+
+        const container = document.getElementById('tree-container');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const nodeMap = {};
+
+        // Create Nodes
+        skills.forEach(skill => {
+            const node = document.createElement('div');
+            node.className = 'node';
+            node.style.left = skill.x + 'px';
+            node.style.top = skill.y + 'px';
+            node.innerText = skill.label;
+
+            node.onmousemove = (e) => {
+                tooltip.style.display = 'block';
+                tooltip.style.left = e.pageX + 10 + 'px';
+                tooltip.style.top = e.pageY + 'px';
+                tooltip.innerText = skill.description;
+            };
+            node.onmouseleave = () => tooltip.style.display = 'none';
+
+            container.appendChild(node);
+            nodeMap[skill.id] = { el: node, x: skill.x, y: skill.y };
+        });
+
+        // Draw Arrows
+        function drawLines() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            skills.forEach(skill => {
+                if (skill.parent) {
+                    const from = nodeMap[skill.parent];
+                    const to = nodeMap[skill.id];
+                    const fromX = from.x + 80;
+                    const fromY = from.y + 25;
+                    const toX = to.x + 80;
+                    const toY = to.y + 25;
+
+                    ctx.beginPath();
+                    ctx.moveTo(fromX, fromY);
+                    ctx.lineTo(toX, toY);
+                    ctx.strokeStyle = '#999';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Draw arrowhead
+                    const angle = Math.atan2(toY - fromY, toX - fromX);
+                    const arrowLength = 10;
+                    ctx.beginPath();
+                    ctx.moveTo(toX, toY);
+                    ctx.lineTo(toX - arrowLength * Math.cos(angle - 0.3), toY - arrowLength * Math.sin(angle - 0.3));
+                    ctx.lineTo(toX - arrowLength * Math.cos(angle + 0.3), toY - arrowLength * Math.sin(angle + 0.3));
+                    ctx.closePath();
+                    ctx.fillStyle = '#999';
+                    ctx.fill();
+                }
+            });
+        }
+
+        drawLines();
+        window.onresize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawLines();
+        };
+    </script>
+</body>
+
+</html>

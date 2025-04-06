@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills Tree</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      padding: 20px;
+    }
+    
+    .skills-container {
+      width: 100%;
+      overflow: auto;
+      position: relative;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      height: 80vh;
+    }
+    
+    .skills-board {
+      position: relative;
+      min-width: 1200px;
+      min-height: 800px;
+    }
+    
+    .skill-node {
+      position: absolute;
+      background-color: white;
+      border: 2px solid #3498db;
+      border-radius: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      min-width: 120px;
+      text-align: center;
+      user-select: none;
+    }
+    
+    .skill-node:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+    }
+    
+    /* Different colors for different skill levels */
+    .level-1 {
+      border-color: #2c3e50;
+      background-color: #34495e;
+      color: white;
+      font-weight: bold;
+    }
+    
+    .level-2 {
+      border-color: #2980b9;
+      background-color: #3498db;
+      color: white;
+    }
+    
+    .level-3 {
+      border-color: #16a085;
+      background-color: #1abc9c;
+      color: white;
+    }
+    
+    .level-4 {
+      border-color: #27ae60;
+      background-color: #2ecc71;
+      color: white;
+    }
+    
+    .connector {
+      position: absolute;
+      background-color: #95a5a6;
+      z-index: 1;
+    }
+    
+    .vertical {
+      width: 2px;
+    }
+    
+    .horizontal {
+      height: 2px;
+    }
+    
+    .tooltip {
+      position: absolute;
+      background-color: #2c3e50;
+      color: white;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      max-width: 250px;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+      pointer-events: none;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .tooltip h4 {
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
+    
+    .tooltip p {
+      margin: 5px 0;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    
+    .tooltip.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+  </style>
+</head>
+<body>
+  <h1>My Skills</h1>
+  <div class="skills-container">
+    <div class="skills-board" id="skillsBoard"></div>
+  </div>
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    // Data structure representing the skill tree
+    const skillsData = {
+      id: "root",
+      name: "Technical Skills",
+      x: 600,
+      y: 50,
+      level: 1,
+      info: "My complete technical skill set, acquired through years of experience, education, and personal projects.",
+      children: [
+        {
+          id: "sw-eng",
+          name: "Software Engineering",
+          x: 300,
+          y: 150,
+          level: 2,
+          info: "Expertise in software development best practices and methodologies.",
+          children: [
+            {
+              id: "design",
+              name: "Software Design",
+              x: 200,
+              y: 250,
+              level: 3,
+              info: "Proficient in creating robust software architectures focusing on scalability and maintainability.",
+              children: [
+                {
+                  id: "patterns",
+                  name: "Design Patterns",
+                  x: 150,
+                  y: 350,
+                  level: 4,
+                  info: "Knowledge of common design patterns and their practical applications.",
+                  children: []
+                },
+                {
+                  id: "arch",
+                  name: "Architecture",
+                  x: 250,
+                  y: 350,
+                  level: 4,
+                  info: "Experience designing microservices and monolithic architectures.",
+                  children: []
+                }
+              ]
+            },
+            {
+              id: "testing",
+              name: "Testing",
+              x: 400,
+              y: 250,
+              level: 3,
+              info: "Comprehensive experience with testing frameworks and methodologies.",
+              children: [
+                {
+                  id: "unit",
+                  name: "Unit Testing",
+                  x: 350,
+                  y: 350,
+                  level: 4,
+                  info: "Proficient with JUnit, pytest, and other unit testing frameworks.",
+                  children: []
+                },
+                {
+                  id: "integration",
+                  name: "Integration Testing",
+                  x: 450,
+                  y: 350,
+                  level: 4,
+                  info: "Experience with end-to-end testing and integration testing approaches.",
+                  children: []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: "ml",
+          name: "Machine Learning",
+          x: 900,
+          y: 150,
+          level: 2,
+          info: "Skills in developing and applying machine learning algorithms to solve real-world problems.",
+          children: [
+            {
+              id: "sup-learn",
+              name: "Supervised Learning",
+              x: 800,
+              y: 250,
+              level: 3,
+              info: "Experience with classification and regression techniques.",
+              children: [
+                {
+                  id: "regression",
+                  name: "Regression",
+                  x: 750,
+                  y: 350,
+                  level: 4,
+                  info: "Linear regression, polynomial regression, and other regression techniques.",
+                  children: []
+                },
+                {
+                  id: "classification",
+                  name: "Classification",
+                  x: 850,
+                  y: 350,
+                  level: 4,
+                  info: "Decision trees, random forests, and neural networks for classification tasks.",
+                  children: []
+                }
+              ]
+            },
+            {
+              id: "deep-learn",
+              name: "Deep Learning",
+              x: 1000,
+              y: 250,
+              level: 3,
+              info: "Skills in neural network architectures and deep learning frameworks.",
+              children: [
+                {
+                  id: "cnn",
+                  name: "CNN",
+                  x: 950,
+                  y: 350,
+                  level: 4,
+                  info: "Convolutional Neural Networks for image processing and computer vision tasks.",
+                  children: []
+                },
+                {
+                  id: "rnn",
+                  name: "RNN & Transformers",
+                  x: 1050,
+                  y: 350,
+                  level: 4,
+                  info: "Recurrent Neural Networks and Transformer architectures for sequence data.",
+                  children: []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    // DOM elements
+    const skillsBoard = document.getElementById('skillsBoard');
+    const tooltip = document.getElementById('tooltip');
+
+    // Function to create a skill node
+    function createSkillNode(skill) {
+      const node = document.createElement('div');
+      node.className = `skill-node level-${skill.level}`;
+      node.id = skill.id;
+      node.textContent = skill.name;
+      node.style.left = `${skill.x}px`;
+      node.style.top = `${skill.y}px`;
+      
+      // Add event listeners for hover effects and tooltip
+      node.addEventListener('mouseenter', () => showTooltip(skill, node));
+      node.addEventListener('mouseleave', hideTooltip);
+      
+      return node;
+    }
+
+    // Function to create connectors between nodes
+    function createConnector(parent, child) {
+      // Create vertical connector
+      const verticalConnector = document.createElement('div');
+      verticalConnector.className = 'connector vertical';
+      
+      // Create horizontal connector
+      const horizontalConnector = document.createElement('div');
+      horizontalConnector.className = 'connector horizontal';
+      
+      // Calculate positions for connectors
+      // Middle point is where horizontal and vertical connect
+      const parentX = parent.x + 70;  // Approximating center of parent node
+      const parentY = parent.y + 45;  // Bottom of parent node
+      const childX = child.x + 70;    // Approximating center of child node
+      const childY = child.y;         // Top of child node
+      
+      // Position vertical connector
+      verticalConnector.style.left = `${parentX}px`;
+      verticalConnector.style.top = `${parentY}px`;
+      verticalConnector.style.height = `${(childY - parentY) / 2}px`;
+      
+      // Position horizontal connector
+      horizontalConnector.style.left = childX < parentX ? 
+        `${childX}px` : `${parentX}px`;
+      horizontalConnector.style.top = `${parentY + (childY - parentY) / 2}px`;
+      horizontalConnector.style.width = `${Math.abs(childX - parentX)}px`;
+      
+      // Create vertical connector from horizontal to child
+      const verticalConnector2 = document.createElement('div');
+      verticalConnector2.className = 'connector vertical';
+      verticalConnector2.style.left = `${childX}px`;
+      verticalConnector2.style.top = `${parentY + (childY - parentY) / 2}px`;
+      verticalConnector2.style.height = `${(childY - parentY) / 2}px`;
+      
+      return [verticalConnector, horizontalConnector, verticalConnector2];
+    }
+
+    // Function to show tooltip with skill information
+    function showTooltip(skill, element) {
+      const rect = element.getBoundingClientRect();
+      const containerRect = skillsBoard.getBoundingClientRect();
+      
+      tooltip.innerHTML = `
+        <h4>${skill.name}</h4>
+        <p>${skill.info}</p>
+      `;
+      
+      // Position tooltip relative to the node
+      tooltip.style.left = `${rect.left - containerRect.left + rect.width + 15}px`;
+      tooltip.style.top = `${rect.top - containerRect.top}px`;
+      tooltip.classList.add('visible');
+    }
+
+    // Function to hide tooltip
+    function hideTooltip() {
+      tooltip.classList.remove('visible');
+    }
+
+    // Recursively render the skill tree
+    function renderSkillTree(skill, parent = null) {
+      const node = createSkillNode(skill);
+      skillsBoard.appendChild(node);
+      
+      // Create connector if this is a child node
+      if (parent) {
+        const connectors = createConnector(parent, skill);
+        connectors.forEach(conn => skillsBoard.appendChild(conn));
+      }
+      
+      // Recursively render children
+      if (skill.children && skill.children.length > 0) {
+        skill.children.forEach(child => renderSkillTree(child, skill));
+      }
+    }
+
+    // Initialize the skill tree
+    renderSkillTree(skillsData);
+
+    // Function to add a new skill to the tree
+    function addSkill(parentId, newSkill) {
+      function findParent(skill) {
+        if (skill.id === parentId) {
+          return skill;
+        }
+        if (skill.children) {
+          for (let child of skill.children) {
+            const found = findParent(child);
+            if (found) return found;
+          }
+        }
+        return null;
+      }
+      
+      const parent = findParent(skillsData);
+      if (parent) {
+        if (!parent.children) parent.children = [];
+        parent.children.push(newSkill);
+        
+        // Clear the board and re-render
+        skillsBoard.innerHTML = '';
+        renderSkillTree(skillsData);
+      }
+    }
+
+    // Example of how to add a new skill
+    // Uncomment to test
+    
+    setTimeout(() => {
+      addSkill("deep-learn", {
+        id: "gan",
+        name: "GANs",
+        x: 1150,
+        y: 350,
+        level: 4,
+        info: "Generative Adversarial Networks for creating synthetic data.",
+        children: []
+      });
+    }, 2000);
+    
+  </script>
+</body>
+</html>
