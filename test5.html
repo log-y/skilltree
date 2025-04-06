@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<!-- working prototype of skill tree, displays all subtree instead of immediate
+ children, don't know if i want to keep this behavior -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -118,107 +119,17 @@
             <div id="skills-tree" class="skills-tree"></div>
         </div>
     </div>
-
+    <script src="skillsdata.js"></script>
     <script>
-        // Skills tree data structure
-        const skillsData = {
-            id: "root",
-            label: "My Skills",
-            description: "An overview of my professional skills and expertise",
-            children: [
-                {
-                    id: "software-engineering",
-                    label: "Software Engineering",
-                    description: "8+ years of experience in software development across multiple domains",
-                    children: [
-                        {
-                            id: "software-design",
-                            label: "Software Design",
-                            description: "Experience with architecture patterns, system design, and clean code principles",
-                            children: [
-                                {
-                                    id: "design-patterns",
-                                    label: "Design Patterns",
-                                    description: "Implementation of common design patterns: Factory, Singleton, Observer, etc."
-                                },
-                                {
-                                    id: "clean-architecture",
-                                    label: "Clean Architecture",
-                                    description: "Building systems with separation of concerns and dependency management"
-                                }
-                            ]
-                        },
-                        {
-                            id: "testing",
-                            label: "Testing",
-                            description: "Expertise in various testing methodologies and frameworks",
-                            children: [
-                                {
-                                    id: "unit-testing",
-                                    label: "Unit Testing",
-                                    description: "Experience with Jest, JUnit, pytest, and other testing frameworks"
-                                },
-                                {
-                                    id: "integration-testing",
-                                    label: "Integration Testing",
-                                    description: "End-to-end testing of complex systems and APIs"
-                                }
-                            ]
-                        },
-                    ]
-                },
-                {
-                    id: "machine-learning",
-                    label: "Machine Learning",
-                    description: "Experience with various ML algorithms and frameworks",
-                    children: [
-                        {
-                            id: "deep-learning",
-                            label: "Deep Learning",
-                            description: "Neural networks and deep learning frameworks",
-                            children: [
-                                {
-                                    id: "tensorflow",
-                                    label: "TensorFlow",
-                                    description: "Building and deploying models with TensorFlow and Keras"
-                                },
-                                {
-                                    id: "pytorch",
-                                    label: "PyTorch",
-                                    description: "Research and prototyping with PyTorch"
-                                }
-                            ]
-                        },
-                        {
-                            id: "ml-algorithms",
-                            label: "ML Algorithms",
-                            description: "Experience with traditional machine learning algorithms",
-                            children: [
-                                {
-                                    id: "supervised",
-                                    label: "Supervised Learning",
-                                    description: "Classification and regression techniques"
-                                },
-                                {
-                                    id: "unsupervised",
-                                    label: "Unsupervised Learning",
-                                    description: "Clustering and dimensionality reduction"
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        };
-
+        
         // Tree rendering constants
         const NODE_WIDTH = 160;
         const NODE_HEIGHT = 60;
         const LEVEL_HEIGHT = 140;
-        const HORIZONTAL_SPACING = 40;
+        const HORIZONTAL_SPACING = 30;
 
         // Global variables
-        
+        let expandedState = {};
         let nodeElements = {};
         let tooltip = null;
 
@@ -250,44 +161,63 @@
             nodeContent.className = 'node-content';
             nodeContent.textContent = node.label;
 
+            // Attach click handler here
+            nodeContent.addEventListener('click', (e) => {
+                e.stopPropagation();
+                node._expanded = !node._expanded;
+                initializeTree();
+            });
+
             nodeElement.appendChild(nodeContent);
             nodeElement.dataset.description = node.description;
             nodeElement.dataset.nodeId = node.id;
 
-            // Store reference to DOM element
             nodeElements[node.id] = nodeElement;
 
             return nodeElement;
         }
 
+
         function renderNode(node, level, index, container) {
             const nodeElement = createNode(node);
             container.appendChild(nodeElement);
 
-            // Always render children if they exist
-            if (node.children && node.children.length > 0) {
+            const isExpanded = expandedState[node.id] !== false; // default to true
+            node._expanded = isExpanded;
+
+            const nodeContent = nodeElement.querySelector('.node-content');
+            nodeContent.addEventListener('click', (e) => {
+                e.stopPropagation();
+                expandedState[node.id] = !isExpanded;
+                initializeTree(); // re-render
+            });
+
+            if (node.children && isExpanded) {
                 node.children.forEach((child, childIndex) => {
+                    // const ne = createNode(child);
+                    // container.appendChild(ne);
+                    // const ie = expandedState[node.id] !== false;
+                    // node._expanded = isExpanded;
                     renderNode(child, level + 1, childIndex, container);
                 });
             }
         }
 
+
         function positionNodes() {
             // Calculate positions for all visible nodes
             calculateNodePositions(skillsData, 0, 0);
         }
-
         function calculateNodePositions(node, level, startX) {
             const nodeElement = nodeElements[node.id];
 
-            if (!node.children || node.children.length === 0) {
-                // Position leaf node
+            if (!node.children || node.children.length === 0 || node._expanded === false) {
                 nodeElement.style.top = `${level * LEVEL_HEIGHT}px`;
                 nodeElement.style.left = `${startX}px`;
                 return { width: NODE_WIDTH, node: nodeElement };
             }
 
-            // Calculate positions of all children
+            // Proceed as before if expanded...
             let totalChildrenWidth = 0;
             const childPositions = [];
 
@@ -297,17 +227,12 @@
                     level + 1,
                     startX + totalChildrenWidth
                 );
-
                 totalChildrenWidth += childResult.width + HORIZONTAL_SPACING;
                 childPositions.push(childResult);
             });
 
-            // Adjust for spacing after the last child
-            if (totalChildrenWidth > 0) {
-                totalChildrenWidth -= HORIZONTAL_SPACING;
-            }
+            if (totalChildrenWidth > 0) totalChildrenWidth -= HORIZONTAL_SPACING;
 
-            // Position parent node centered above its children
             const nodeX = startX + (totalChildrenWidth - NODE_WIDTH) / 2;
             nodeElement.style.top = `${level * LEVEL_HEIGHT}px`;
             nodeElement.style.left = `${Math.max(0, nodeX)}px`;
@@ -329,9 +254,7 @@
         }
 
         function createConnectors(node) {
-            if (!node.children || node.children.length === 0) {
-                return;
-            }
+            if (!node.children || node.children.length === 0 || node._expanded === false) return;
 
             const parentElement = nodeElements[node.id];
             const parentLeft = parentElement.offsetLeft;
