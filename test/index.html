@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Tree Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>My Skills</h1>
+
+<div class="skill-tree-container">
+    <svg id="skill-lines"></svg>
+
+    <ul class="skill-tree">
+        <li>
+            <!-- <div class="node" data-source="Broad experience across the development lifecycle.">My Technical</div> -->
+            <div class="node" data-source="Broad experience across the development lifecycle.">Software Engineering</div>
+            <ul>
+                <li>
+                    <div class="node" data-source="Designing scalable and maintainable software systems.">Software Design</div>
+                    <ul>
+                        <li><div class="node" data-source="Object-Oriented Programming principles.">OOP</div></li>
+                        <li><div class="node" data-source="SOLID principles for robust code.">SOLID Principles</div></li>
+                        <li><div class="node" data-source="Applying common design patterns (GoF).">Design Patterns</div></li>
+                    </ul>
+                </li>
+                <li>
+                    <div class="node" data-source="Ensuring code quality and reliability.">Testing</div>
+                    <ul>
+                        <li><div class="node" data-source="Writing isolated tests for components.">Unit Testing</div></li>
+                        <li><div class="node" data-source="Testing interactions between components.">Integration Testing</div></li>
+                        <li><div class="node" data-source="Automated end-to-end verification.">E2E Testing</div></li>
+                    </ul>
+                </li>
+                <li>
+                    <div class="node" data-source="Backend development expertise.">Backend Dev</div>
+                     <ul>
+                        <li>
+                            <div class="node" data-source="Proficient in Python for backend & scripting.">Python</div>
+                            <ul>
+                                <li><div class="node" data-source="Web framework for rapid development.">Django</div></li>
+                                <li><div class="node" data-source="Microframework for APIs.">Flask</div></li>
+                            </ul>
+                        </li>
+                         <li><div class="node" data-source="Building and consuming RESTful APIs.">REST APIs</div></li>
+                         <li><div class="node" data-source="Experience with SQL databases (PostgreSQL, MySQL).">SQL Databases</div></li>
+                         <li><div class="node" data-source="Familiarity with NoSQL (MongoDB).">NoSQL Databases</div></li>
+                    </ul>
+                </li>
+                 <li>
+                    <div class="node" data-source="Frontend development skills.">Frontend Dev</div>
+                     <ul>
+                        <li><div class="node" data-source="Core language of the web.">JavaScript</div></li>
+                        <li><div class="node" data-source="Structuring web content.">HTML5</div></li>
+                        <li><div class="node" data-source="Styling web content.">CSS3</div></li>
+                         <li><div class="node" data-source="Modern JS framework experience.">React</div></li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <div class="node" data-source="Applying algorithms to data for insights and predictions.">Machine Learning</div>
+             <ul>
+                <li><div class="node" data-source="Core ML libraries in Python.">Python (ML)</div>
+                    <ul>
+                        <li><div class="node" data-source="Numerical computing library.">NumPy</div></li>
+                        <li><div class="node" data-source="Data manipulation and analysis.">Pandas</div></li>
+                        <li><div class="node" data-source="Comprehensive ML library.">Scikit-learn</div></li>
+                        <li><div class="node" data-source="Deep learning framework.">TensorFlow/Keras</div></li>
+                    </ul>
+                </li>
+                <li><div class="node" data-source="Understanding fundamental ML concepts.">ML Concepts</div>
+                     <ul>
+                        <li><div class="node" data-source="Learning from labeled data.">Supervised Learning</div></li>
+                        <li><div class="node" data-source="Finding patterns in unlabeled data.">Unsupervised Learning</div></li>
+                         <li><div class="node" data-source="Evaluating model performance.">Model Evaluation</div></li>
+                    </ul>
+                </li>
+             </ul>
+        </li>
+         </ul>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
