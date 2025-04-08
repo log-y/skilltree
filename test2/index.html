@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Tree</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>My Skills</h1>
+
+<div class="skill-tree-container">
+    <ul class="skill-tree">
+        <li class="skill-node expandable"> <div class="node-content">
+                <span class="toggle-icon"></span>
+                <span class="skill-name" data-details="Overall knowledge of building and maintaining software systems.">Software Engineering</span>
+            </div>
+            <ul class="children">
+                <li class="skill-node expandable">
+                    <div class="node-content">
+                        <span class="toggle-icon"></span>
+                        <span class="skill-name" data-details="Designing scalable and maintainable software architectures.">Software Design</span>
+                    </div>
+                    <ul class="children">
+                        <li class="skill-node">
+                            <div class="node-content">
+                                <span class="skill-name" data-details="Applying design patterns like Singleton, Factory, Observer.">Design Patterns</span>
+                            </div>
+                        </li>
+                        <li class="skill-node">
+                             <div class="node-content">
+                                <span class="skill-name" data-details="SOLID principles, DRY, KISS.">Architectural Principles</span>
+                             </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="skill-node expandable">
+                    <div class="node-content">
+                        <span class="toggle-icon"></span>
+                        <span class="skill-name" data-details="Writing code to implement features and fix bugs.">Programming</span>
+                    </div>
+                    <ul class="children">
+                        <li class="skill-node">
+                            <div class="node-content">
+                                <span class="skill-name" data-details="Proficient in Python for web dev, scripting, and data analysis. Acquired through projects X, Y, Z.">Python</span>
+                            </div>
+                        </li>
+                        <li class="skill-node">
+                            <div class="node-content">
+                                <span class="skill-name" data-details="Strong C++ skills for performance-critical applications. Used in course A, project B.">C++</span>
+                             </div>
+                        </li>
+                        <li class="skill-node">
+                             <div class="node-content">
+                                <span class="skill-name" data-details="Frontend development with JS. Used in portfolio website, project C.">JavaScript</span>
+                             </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="skill-node">
+                    <div class="node-content">
+                        <span class="skill-name" data-details="Ensuring code quality through unit, integration, and E2E tests. Used Jest, PyTest.">Testing</span>
+                    </div>
+                    </li>
+            </ul>
+        </li>
+        <li class="skill-node expandable"> <div class="node-content">
+                 <span class="toggle-icon"></span>
+                 <span class="skill-name" data-details="Building models that learn from data.">Machine Learning</span>
+            </div>
+            <ul class="children">
+                <li class="skill-node">
+                    <div class="node-content">
+                        <span class="skill-name" data-details="Understanding algorithms like Linear Regression, SVM, Decision Trees. Learned in course D.">Supervised Learning</span>
+                    </div>
+                </li>
+                <li class="skill-node">
+                    <div class="node-content">
+                        <span class="skill-name" data-details="Using libraries like Scikit-learn, TensorFlow, PyTorch. Applied in project E.">ML Frameworks</span>
+                    </div>
+                </li>
+            </ul>
+        </li>
+         <li class="skill-node"> <div class="node-content">
+                 <span class="skill-name" data-details="Managing cloud resources on AWS/GCP/Azure. Certified in F.">Cloud Platforms</span>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<div id="skill-tooltip"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

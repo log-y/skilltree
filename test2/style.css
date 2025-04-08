@@ -1,0 +1,157 @@
+/* Basic Reset & Body */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+.skill-tree-container {
+    display: flex;
+    justify-content: center; /* Center the tree horizontally */
+}
+
+/* Remove default list styling */
+.skill-tree, .skill-tree ul {
+    list-style-type: none;
+    padding-left: 0; /* Remove default padding */
+    margin: 0;
+}
+
+/* General Tree Structure & Spacing */
+.skill-tree {
+    /* No special styling needed for the root ul itself */
+}
+
+.skill-tree ul {
+    /* Indentation for children */
+    padding-left: 40px; /* Controls horizontal spacing/indentation */
+    position: relative; /* Needed for absolute positioning of lines */
+    margin-top: 5px; /* Space above children block */
+}
+
+/* Node Styling */
+.skill-node {
+    margin-bottom: 10px; /* Vertical spacing between sibling nodes */
+    position: relative; /* Crucial for positioning lines */
+}
+
+.node-content {
+    display: inline-block; /* Allows background/border */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: default; /* Default cursor */
+    position: relative; /* Needed for hover effect relative positioning */
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.node-content:hover {
+    background-color: #e9e9e9;
+    border-color: #aaa;
+}
+
+.skill-name {
+    margin-left: 5px; /* Space text away from potential icon */
+}
+
+/* Toggle Icon Styling (+/-) */
+.toggle-icon {
+    display: inline-block;
+    width: 14px; /* Fixed width */
+    height: 14px;
+    line-height: 12px; /* Center content vertically */
+    text-align: center;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #555;
+    background-color: #f0f0f0;
+    cursor: pointer; /* Make the icon clickable */
+    margin-right: 5px;
+    visibility: hidden; /* Hide by default */
+}
+
+.skill-node.expandable > .node-content > .toggle-icon {
+    visibility: visible; /* Only show for expandable nodes */
+}
+
+/* Set content based on collapsed/expanded state (JS will toggle .collapsed) */
+.skill-node.expandable:not(.collapsed) > .node-content > .toggle-icon::before {
+    content: '−'; /* Minus sign for expanded */
+}
+
+.skill-node.expandable.collapsed > .node-content > .toggle-icon::before {
+    content: '+'; /* Plus sign for collapsed */
+}
+
+/* Initially hide children of collapsed nodes */
+.skill-node.collapsed > .children {
+    display: none;
+}
+
+/* --- Line Drawing --- */
+
+/* Vertical line coming down from parent */
+.skill-tree ul::before {
+    content: '';
+    position: absolute;
+    left: -20px; /* Position left of the child nodes (half of padding-left) */
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #ccc;
+    /* Adjust bottom slightly to connect properly */
+     bottom: 10px; /* Stops just above the last node's horizontal line */
+}
+
+/* Adjust vertical line termination for the last child's connection */
+.skill-node:last-child > .children::before {
+     height: 20px; /* Only extend down to meet the last node's line */
+     bottom: auto;
+}
+
+
+/* Horizontal line connecting node to parent's vertical line */
+.skill-node::before {
+    content: '';
+    position: absolute;
+    left: -20px; /* Same horizontal position as parent's vertical line */
+    top: 18px;   /* Align vertically with the middle of the node-content */
+    width: 20px; /* Extends from vertical line to the node */
+    height: 1px;
+    background-color: #ccc;
+}
+
+/* Don't draw lines for top-level nodes */
+.skill-tree > .skill-node::before {
+    display: none;
+}
+.skill-tree > .skill-node > .children::before {
+    display: none; /* No vertical line needed above the very first level */
+}
+
+
+/* --- Tooltip Styling --- */
+#skill-tooltip {
+    position: absolute; /* Position relative to the viewport */
+    display: none; /* Hidden by default */
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap; /* Prevent wrapping */
+    z-index: 1000; /* Ensure it's on top */
+    pointer-events: none; /* Don't let tooltip interfere with mouse events */
+}
